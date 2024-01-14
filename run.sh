@@ -1,6 +1,8 @@
 #!/bin/bash
 
-# to stop on first error
+
+FILE="core/store.sqlite3"
+
 set -e
 
 # Delete older .pyc files
@@ -8,6 +10,11 @@ set -e
 
 # Run required migrations
 export FLASK_APP=core/server.py
+
+if [ -f "$FILE" ]; then
+    rm "$FILE"
+fi
+flask db upgrade -d core/migrations/
 
 # flask db init -d core/migrations/
 # flask db migrate -m "Initial migration." -d core/migrations/

@@ -2,9 +2,10 @@ from flask import Blueprint
 from core import db
 from core.apis import decorators
 from core.apis.responses import APIResponse
-from core.models.assignments import Assignment
+from core.models.assignments import Assignment,AssignmentStateEnum
 from core.models.teachers import Teacher
 from.schema import AssignmentSchema,AssignmentGradeSchema,TeacherSchema
+from core.libs.exceptions import FyleError
 
 
 principal_assignment_resources = Blueprint('principal_assignment_resources',__name__)
@@ -31,6 +32,10 @@ def get_all_teachers(p):
 def grade_assignment(p, incoming_payload):
     """Grade an assignment"""
     grade_assignment_payload = AssignmentGradeSchema().load(incoming_payload)
+    cur_assignment  = Assignment.get_by_id(grade_assignment_payload.id)
+    
+    if cur_assignment.state == AssignmentStateEnum.DRAFT:    
+        raise FyleError(400, 'Cannot grade a draft assignment')
 
     graded_assignment = Assignment.mark_grade(
         _id=grade_assignment_payload.id,
