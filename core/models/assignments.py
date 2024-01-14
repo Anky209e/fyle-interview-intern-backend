@@ -91,3 +91,8 @@ class Assignment(db.Model):
     @classmethod
     def get_assignments_by_teacher(cls, teacher_id):
         return cls.filter(cls.teacher_id == teacher_id).all()
+    
+    @classmethod
+    def get_submitted_and_graded(cls):
+        condition = cls.teacher_id is not None and cls.state == "GRADED"
+        return cls.filter(condition).all()
